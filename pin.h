@@ -1,14 +1,17 @@
-/* 
- * File:   
- * Author: 
- * Comments:
- * Revision history: 
+/*
+ * File:   pin.h
+ * Author: Jakub Dudarewicz
+ *
+ * Created on 1 october 2024, 14:04
  */
 
 #ifndef XC_PIN_H
 #define	XC_PIN_H
 
+#define SW_NUMBER 5
+
 #include <xc.h> // include processor files - each processor file is guarded.  
+
 #include <stdint.h>
 #include <stdbool.h>
 

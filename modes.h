@@ -1,5 +1,5 @@
 /*
- * File:   led_driver.h
+ * File:   modes.h
  * Author: Jakub Dudarewicz
  *
  * Created on 1 october 2024, 14:04
@@ -7,8 +7,8 @@
 
 // This is a guard condition so that contents of this file are not included
 // more than once.  
-#ifndef XC_LED_DRIVER_H
-#define	XC_LED_DRIVER_H
+#ifndef XC_MODES_H
+#define	XC_MODES_H
 
 #include <xc.h> // include processor files - each processor file is guarded.  
 
@@ -16,11 +16,12 @@
 extern "C" {
 #endif /* __cplusplus */
 
-void displayLED(char string[5]);
+typedef void (*ModeHandler)();
+
+extern ModeHandler Handlers[];
 
 #ifdef	__cplusplus
 }
 #endif /* __cplusplus */
 
-#endif	/* XC_LED_DRIVER_H */
-
+#endif	/* XC_MODES_H */

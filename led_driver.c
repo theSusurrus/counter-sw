@@ -1,10 +1,11 @@
 /*
  * File:   led_driver.c
- * Author: jakub
+ * Author: Jakub Dudarewicz
  *
- * Created on 1 pa?dziernika 2024, 14:04
+ * Created on 1 october 2024, 14:04
  */
-#define F_CPU 1000000UL
+
+#include "main.h"
 
 #include <util/delay.h>
 #include <stdint.h>

@@ -1,9 +1,13 @@
 /*
  * File:   pin.c
- * Author: jakub
+ * Author: Jakub Dudarewicz
  *
- * Created on 1 pa?dziernika 2024, 12:08
+ * Created on 1 october 2024, 12:08
  */
+
+#include "main.h"
+
+#include <util/delay.h>
 
 #include "pin.h"
 
@@ -36,8 +40,17 @@ void setGPIO(GPIO pin, GPIOState state) {
     }
 }
 
+static bool readGPIORaw(GPIO pin) {
+    return (*pin.pin & (1 << pin.index)) == 0;
+}
+
 bool readGPIO(GPIO pin) {
-    return *pin.pin & (1 << pin.index);
+    bool pressed = readGPIORaw(pin);
+    if(pressed) {
+        _delay_ms(5);
+        readGPIORaw(pin);
+    }
+    return pressed;
 }
 
 GPIO CCD1 = {
