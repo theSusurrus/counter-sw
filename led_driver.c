@@ -23,8 +23,8 @@ typedef struct {
     uint8_t DP : 1;
 } Segments;
 
-static void SetAnode(Pin pin, uint8_t state) {
-    setPin(pin, state == 1 ? OUTPUT_SOURCE : OUTPUT_SINK);
+static void SetAnode(GPIO pin, uint8_t state) {
+    setGPIO(pin, state == 1 ? OUTPUT_SOURCE : OUTPUT_SINK);
 }
 
 static void setAnodes(Segments segments) {
@@ -249,12 +249,12 @@ Segments CharSpace = {
 
 static void clear() {
     setAnodes(CharSpace);
-    setPin(CCD1, TRISTATE);
-    setPin(CCD2, TRISTATE);
-    setPin(CCD3, TRISTATE);
-    setPin(CCD4, TRISTATE);
-    setPin(CCL12, TRISTATE);
-    setPin(CCL3, TRISTATE);
+    setGPIO(CCD1, TRISTATE);
+    setGPIO(CCD2, TRISTATE);
+    setGPIO(CCD3, TRISTATE);
+    setGPIO(CCD4, TRISTATE);
+    setGPIO(CCL12, TRISTATE);
+    setGPIO(CCL3, TRISTATE);
 }
 
 static void setCharacter(char c) {
@@ -318,22 +318,22 @@ static void setCharacter(char c) {
 void displayLED(char string[5]) {
     clear();
     setCharacter(string[0]);
-    setPin(CCD4, OUTPUT_SINK);
+    setGPIO(CCD4, OUTPUT_SINK);
     _delay_us(REFRESH_DELAY_US);
     
     clear();
     setCharacter(string[1]);
-    setPin(CCD3, OUTPUT_SINK);
+    setGPIO(CCD3, OUTPUT_SINK);
     _delay_us(REFRESH_DELAY_US);
     
     clear();
     setCharacter(string[2]);
-    setPin(CCD2, OUTPUT_SINK);
+    setGPIO(CCD2, OUTPUT_SINK);
     _delay_us(REFRESH_DELAY_US);
     
     clear();
     setCharacter(string[3]);
-    setPin(CCD1, OUTPUT_SINK);
+    setGPIO(CCD1, OUTPUT_SINK);
     _delay_us(REFRESH_DELAY_US);
     
 //    clear();

@@ -15,107 +15,168 @@ void setRegBit(volatile uint8_t* reg, uint8_t pin, bool state) {
     }
 }
 
-void setPin(Pin pin, PinState state) {
+void setGPIO(GPIO pin, GPIOState state) {
     switch(state) {
         case TRISTATE:
-            setRegBit(pin.ddr, pin.pin, false);
-            setRegBit(pin.port, pin.pin, false);
+            setRegBit(pin.ddr, pin.index, false);
+            setRegBit(pin.port, pin.index, false);
             break;
         case OUTPUT_SOURCE:
-            setRegBit(pin.ddr, pin.pin, true);
-            setRegBit(pin.port, pin.pin, true);
+            setRegBit(pin.ddr, pin.index, true);
+            setRegBit(pin.port, pin.index, true);
             break;
         case OUTPUT_SINK:
-            setRegBit(pin.ddr, pin.pin, true);
-            setRegBit(pin.port, pin.pin, false);
+            setRegBit(pin.ddr, pin.index, true);
+            setRegBit(pin.port, pin.index, false);
             break;
         case INPUT_SOURCING:
-            setRegBit(pin.ddr, pin.pin, false);
-            setRegBit(pin.port, pin.pin, true);
+            setRegBit(pin.ddr, pin.index, false);
+            setRegBit(pin.port, pin.index, true);
             break;
     }
 }
 
-Pin CCD1 = {
+bool readGPIO(GPIO pin) {
+    return *pin.pin & (1 << pin.index);
+}
+
+GPIO CCD1 = {
     .port = &PORTD,
     .ddr = &DDRD,
-    .pin = 5,
+    .pin = &PIND,
+    .index = 5,
 };
 
-Pin CCD2 = {
+GPIO CCD2 = {
     .port = &PORTC,
     .ddr = &DDRC,
-    .pin = 0,
+    .pin = &PINC,
+    .index = 0,
 };
 
-Pin CCD3 = {
+GPIO CCD3 = {
     .port = &PORTD,
     .ddr = &DDRD,
-    .pin = 0,
+    .pin = &PIND,
+    .index = 0,
 };
 
-Pin CCD4 = {
+GPIO CCD4 = {
     .port = &PORTD,
     .ddr = &DDRD,
-    .pin = 4,
+    .pin = &PIND,
+    .index = 4,
 };
 
-Pin CCL12 = {
+GPIO CCL12 = {
     .port = &PORTC,
     .ddr = &DDRC,
-    .pin = 3,
+    .pin = &PINC,
+    .index = 3,
 };
 
-Pin CCL3 = {
+GPIO CCL3 = {
     .port = &PORTD,
     .ddr = &DDRD,
-    .pin = 1,
+    .pin = &PIND,
+    .index = 1,
 };
 
-Pin AAL123 = {
+GPIO AAL123 = {
     .port = &PORTD,
     .ddr = &DDRD,
-    .pin = 3,
+    .pin = &PIND,
+    .index = 3,
 };
 
-Pin AB = {
+GPIO AB = {
     .port = &PORTD,
     .ddr = &DDRD,
-    .pin = 6,
+    .pin = &PIND,
+    .index = 6,
 };
 
-Pin AC = {
+GPIO AC = {
     .port = &PORTC,
     .ddr = &DDRC,
-    .pin = 2,
+    .pin = &PINC,
+    .index = 2,
 };
 
-Pin AD = {
+GPIO AD = {
     .port = &PORTC,
     .ddr = &DDRC,
-    .pin = 1,
+    .pin = &PINC,
+    .index = 1,
 };
 
-Pin AE = {
+GPIO AE = {
     .port = &PORTC,
     .ddr = &DDRC,
-    .pin = 4,
+    .pin = &PINC,
+    .index = 4,
 };
 
-Pin AF = {
+GPIO AF = {
     .port = &PORTC,
     .ddr = &DDRC,
-    .pin = 5,
+    .pin = &PINC,
+    .index = 5,
 };
 
-Pin AG = {
+GPIO AG = {
     .port = &PORTD,
     .ddr = &DDRD,
-    .pin = 7,
+    .pin = &PIND,
+    .index = 7,
 };
 
-Pin ADP = {
+GPIO ADP = {
     .port = &PORTD,
     .ddr = &DDRD,
-    .pin = 2,
+    .pin = &PIND,
+    .index = 2,
+};
+
+GPIO SW1 = {
+    .port = &PORTB,
+    .ddr = &DDRB,
+    .pin = &PINB,
+    .index = 6,
+};
+
+GPIO SW2 = {
+    .port = &PORTB,
+    .ddr = &DDRB,
+    .pin = &PINB,
+    .index = 7,
+};
+
+GPIO SW3 = {
+    .port = &PORTB,
+    .ddr = &DDRB,
+    .pin = &PINB,
+    .index = 0,
+};
+
+GPIO SW4 = {
+    .port = &PORTB,
+    .ddr = &DDRB,
+    .pin = &PINB,
+    .index = 1,
+};
+
+GPIO SW5 = {
+    .port = &PORTB,
+    .ddr = &DDRB,
+    .pin = &PINB,
+    .index = 2,
+};
+
+GPIO* SW[5] = {
+    &SW1,
+    &SW2,
+    &SW3,
+    &SW4,
+    &SW5,
 };

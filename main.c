@@ -25,17 +25,20 @@ void integerToString(uint16_t i, char s[5]) {
 
 int main(void) {
     SFIOR |= (1 << PUD);
+    
+    for(int i = 0; i < 4; i++) {
+        setGPIO(*SW[i], TRISTATE);
+    }
+    
+    bool sw[5];
     char string[5] = "1234";
-    int i = 0;
-    int j = 0;
     while(1) {
-        displayLED(string);
-        i += 1;
-        if (i == 5) {
-            i = 0;
-            j += 1;
-            integerToString(j);
+        for(int i = 0; i < 4; i++) {
+            sw[i] = readGPIO(*SW[i]);
+            string[i] = sw[i] ? '1' : '0';
         }
+
+        displayLED(string);
     };
     
     return 0;

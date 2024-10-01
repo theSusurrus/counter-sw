@@ -19,37 +19,45 @@ extern "C" {
 typedef struct {
     volatile uint8_t * port;
     volatile uint8_t * ddr;
-    uint8_t pin;
-} Pin;
+    volatile uint8_t * pin;
+    uint8_t index;
+} GPIO;
 
 typedef enum {
     TRISTATE,
     INPUT_SOURCING,
     OUTPUT_SINK,
     OUTPUT_SOURCE
-} PinState;
+} GPIOState;
 
-extern Pin CCD1;
-extern Pin CCD2;
-extern Pin CCD3;
-extern Pin CCD4;
-extern Pin CCL12;
-extern Pin CCL3;
-extern Pin AAL123;
-extern Pin AB;
-extern Pin AC;
-extern Pin AD;
-extern Pin AE;
-extern Pin AF;
-extern Pin AG;
-extern Pin ADP;
+extern GPIO CCD1;
+extern GPIO CCD2;
+extern GPIO CCD3;
+extern GPIO CCD4;
+extern GPIO CCL12;
+extern GPIO CCL3;
+extern GPIO AAL123;
+extern GPIO AB;
+extern GPIO AC;
+extern GPIO AD;
+extern GPIO AE;
+extern GPIO AF;
+extern GPIO AG;
+extern GPIO ADP;
+
+extern GPIO SW1;
+extern GPIO SW2;
+extern GPIO SW3;
+extern GPIO SW4;
+extern GPIO SW5;
+extern GPIO* SW[5];
 
 void setRegBit(volatile uint8_t* reg, uint8_t pin, bool state);
-void setPin(Pin pin, PinState state);
+void setGPIO(GPIO pin, GPIOState state);
+bool readGPIO(GPIO pin);
 
 #ifdef	__cplusplus
 }
 #endif /* __cplusplus */
 
 #endif	/* XC_PIN_H */
-
