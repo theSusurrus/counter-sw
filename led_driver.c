@@ -8,7 +8,10 @@
 #include "main.h"
 
 #include <util/delay.h>
+#include <avr/interrupt.h>
+#include <avr/io.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "led_driver.h"
 #include "pin.h"
@@ -314,28 +317,38 @@ static void setCharacter(char c) {
     }
 }
 
-#define REFRESH_DELAY_US 1000
+char StringDisplayed[5] = "    ";
+size_t CharacterDisplayed = 0;
+GPIO* CharacterCathodes[] = {
+    &CCD4,
+    &CCD3,
+    &CCD2,
+    &CCD1,
+};
 
 void displayLED(char string[5]) {
+    strcpy(StringDisplayed, string);
+}
+
+// Timer0 overflow interrupt handler (~65ms 4MHz@1024 precale factor)
+ISR(TIMER1_CAPT_vect)
+{
+    unsigned char sreg;
+    /* Save Global Interrupt Flag */
+    sreg = SREG;
+    /* Disable interrupts */
+    cli();
+
+    if(CharacterDisplayed >= 3) {
+        CharacterDisplayed = 0;
+    } else {
+        CharacterDisplayed++;
+    }
+
     clear();
-    setCharacter(string[0]);
-    setGPIO(CCD4, OUTPUT_SINK);
-    _delay_us(REFRESH_DELAY_US);
-    
-    clear();
-    setCharacter(string[1]);
-    setGPIO(CCD3, OUTPUT_SINK);
-    _delay_us(REFRESH_DELAY_US);
-    
-    clear();
-    setCharacter(string[2]);
-    setGPIO(CCD2, OUTPUT_SINK);
-    _delay_us(REFRESH_DELAY_US);
-    
-    clear();
-    setCharacter(string[3]);
-    setGPIO(CCD1, OUTPUT_SINK);
-    _delay_us(REFRESH_DELAY_US);
-    
-//    clear();
+    setCharacter(StringDisplayed[CharacterDisplayed]);
+    setGPIO(*CharacterCathodes[CharacterDisplayed], OUTPUT_SINK);
+
+    SREG = sreg;
+    sei();
 }
