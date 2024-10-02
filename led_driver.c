@@ -27,7 +27,7 @@ typedef struct {
     uint8_t DP : 1;
 } Segments;
 
-static void SetAnode(GPIO pin, uint8_t state) {
+static void inline SetAnode(GPIO pin, uint8_t state) {
     setGPIO(pin, state == 1 ? OUTPUT_SOURCE : OUTPUT_SINK);
 }
 
@@ -251,7 +251,7 @@ Segments CharSpace = {
     .DP = 0,
 };
 
-static void clear() {
+void clearDisplay() {
     setAnodes(CharSpace);
     setGPIO(CCD1, TRISTATE);
     setGPIO(CCD2, TRISTATE);
@@ -312,7 +312,7 @@ static void setCharacter(char c) {
             setAnodes(Char9);
             break;
         default:
-            clear();
+            clearDisplay();
             break;
     }
 }
@@ -330,24 +330,37 @@ void displayLED(char string[5]) {
     strcpy(StringDisplayed, string);
 }
 
-// Timer0 overflow interrupt handler (~65ms 4MHz@1024 precale factor)
-ISR(TIMER1_CAPT_vect)
+
+bool interruptFired = false;
+void handleLEDInterrupt() {
+    cli();
+
+    if(interruptFired) {
+        interruptFired = false;
+
+        if(CharacterDisplayed >= 3) {
+            CharacterDisplayed = 0;
+        } else {
+            CharacterDisplayed++;
+        }
+
+        clearDisplay();
+        setCharacter(StringDisplayed[CharacterDisplayed]);
+        setGPIO(*CharacterCathodes[CharacterDisplayed], OUTPUT_SINK);
+    }
+
+    sei();
+}
+
+ISR(TIMER2_COMP_vect)
 {
-    unsigned char sreg;
     /* Save Global Interrupt Flag */
-    sreg = SREG;
+    unsigned char sreg = SREG;
+
     /* Disable interrupts */
     cli();
 
-    if(CharacterDisplayed >= 3) {
-        CharacterDisplayed = 0;
-    } else {
-        CharacterDisplayed++;
-    }
-
-    clear();
-    setCharacter(StringDisplayed[CharacterDisplayed]);
-    setGPIO(*CharacterCathodes[CharacterDisplayed], OUTPUT_SINK);
+    interruptFired = true;
 
     SREG = sreg;
     sei();

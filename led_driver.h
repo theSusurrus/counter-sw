@@ -16,6 +16,8 @@
 extern "C" {
 #endif /* __cplusplus */
 
+void handleLEDInterrupt();
+void clearDisplay();
 void displayLED(char string[5]);
 
 #ifdef	__cplusplus

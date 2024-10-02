@@ -15,6 +15,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "timekeeping.h"
+
 #ifdef	__cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -57,7 +59,10 @@ extern GPIO* SW[5];
 
 void setRegBit(volatile uint8_t* reg, uint8_t pin, bool state);
 void setGPIO(GPIO pin, GPIOState state);
-bool readGPIO(GPIO pin);
+bool readGpioRaw(GPIO pin);
+bool readGpioBlocking(GPIO pin);
+bool readGpioNonblocking(GPIO pin, bool* last_pushed, Tick* tick_at_first_pushed);
+bool readGpioNonblockingReleased(GPIO pin, bool* last_pushed, Tick* tick_at_first_pushed);
 
 #ifdef	__cplusplus
 }

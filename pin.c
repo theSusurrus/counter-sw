@@ -10,6 +10,7 @@
 #include <util/delay.h>
 
 #include "pin.h"
+#include "led_driver.h"
 
 void setRegBit(volatile uint8_t* reg, uint8_t pin, bool state) {
     if(state) {
@@ -40,17 +41,73 @@ void setGPIO(GPIO pin, GPIOState state) {
     }
 }
 
-static bool readGPIORaw(GPIO pin) {
+bool readGpioRaw(GPIO pin) {
     return (*pin.pin & (1 << pin.index)) == 0;
 }
 
-bool readGPIO(GPIO pin) {
-    bool pressed = readGPIORaw(pin);
+bool readGpioBlocking(GPIO pin) {
+    bool pressed = readGpioRaw(pin);
     if(pressed) {
         _delay_ms(5);
-        readGPIORaw(pin);
+        readGpioRaw(pin);
     }
     return pressed;
+}
+
+/**
+ * Returns true after a button has been held for a moment
+ */
+bool readGpioNonblocking(GPIO pin, bool* last_pushed, Tick* tick_at_first_pushed) {
+    bool debounce_finished = false;
+    bool pushed = readGpioRaw(pin);
+
+    if(pushed) {
+        do {
+            if(last_pushed == false) {
+                *tick_at_first_pushed = getTick();
+            } else {
+                TickDifference diff = getTick() - *tick_at_first_pushed;
+                if(diff < 2) {
+                    /* at least two ticks before changing modes */
+                    debounce_finished = true;
+                    break;
+                }
+            }
+        } while(0);
+    }
+
+    return debounce_finished;
+}
+
+/**
+ * Returns true after a button has been held for a moment and released
+ */
+bool readGpioNonblockingReleased(GPIO pin, bool* last_pushed, Tick* tick_at_first_pushed) {
+    bool debounce_finished = false;
+    bool pushed = readGpioRaw(pin);
+
+    if(pushed) {
+        do {
+            if(*last_pushed == false) {
+                *tick_at_first_pushed = getTick();
+            } else {
+                TickDifference diff = getTick() - *tick_at_first_pushed;
+                if(diff < 2) {
+                    /* at least two ticks before changing modes */
+                    debounce_finished = true;
+                    break;
+                }
+            }
+        } while(0);
+    } else {
+        if(*last_pushed == true && debounce_finished == true) {
+            return true;
+        }
+    }
+
+    *last_pushed = pushed;
+
+    return false;
 }
 
 GPIO CCD1 = {
