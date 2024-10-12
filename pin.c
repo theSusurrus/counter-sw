@@ -67,7 +67,7 @@ bool readGpioNonblocking(GPIO pin, bool* last_pushed, Tick* tick_at_first_pushed
                 *tick_at_first_pushed = getTick();
             } else {
                 TickDifference diff = getTick() - *tick_at_first_pushed;
-                if(diff < 2) {
+                if(diff > 2) {
                     /* at least two ticks before changing modes */
                     debounce_finished = true;
                     break;
@@ -75,6 +75,8 @@ bool readGpioNonblocking(GPIO pin, bool* last_pushed, Tick* tick_at_first_pushed
             }
         } while(0);
     }
+
+    *last_pushed = pushed;
 
     return debounce_finished;
 }
@@ -83,30 +85,28 @@ bool readGpioNonblocking(GPIO pin, bool* last_pushed, Tick* tick_at_first_pushed
  * Returns true after a button has been held for a moment and released
  */
 bool readGpioNonblockingReleased(GPIO pin, bool* last_pushed, Tick* tick_at_first_pushed) {
-    bool debounce_finished = false;
+    static bool debounce_finished = false;
     bool pushed = readGpioRaw(pin);
 
     if(pushed) {
-        do {
-            if(*last_pushed == false) {
-                *tick_at_first_pushed = getTick();
-            } else {
-                TickDifference diff = getTick() - *tick_at_first_pushed;
-                if(diff < 2) {
-                    /* at least two ticks before changing modes */
-                    debounce_finished = true;
-                    break;
-                }
+        if(*last_pushed == false) {
+            *tick_at_first_pushed = getTick();
+        } else {
+            Tick now = getTick();
+            volatile TickDifference diff = now - (*tick_at_first_pushed);
+            if(diff > 2) {
+                /* at least two ticks before changing modes */
+                debounce_finished = true;
             }
-        } while(0);
+        }
     } else {
         if(*last_pushed == true && debounce_finished == true) {
+            *last_pushed = pushed;
             return true;
         }
     }
 
     *last_pushed = pushed;
-
     return false;
 }
 

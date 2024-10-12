@@ -60,8 +60,6 @@ int main(void) {
         Handlers[active_mode]();
 
         handleLEDInterrupt();
-
-        last_mode_change = mode_change;
     };
     
     return 0;
