@@ -15,9 +15,9 @@
 #include "timekeeping.h"
 
 static void integerToString(uint16_t i, char s[5]) {
-    s[0] = (i / 1000) % 10 + '0';
-    s[1] = (i / 100) % 10 + '0';
-    s[2] = (i / 10)% 10 + '0';
+    s[0] = i < 1000 ? ' ' : (i / 1000) % 10 + '0';
+    s[1] = i < 100 ? ' ' : (i / 100) % 10 + '0';
+    s[2] = i < 10 ? ' ' : (i / 10)% 10 + '0';
     s[3] = (i % 10) + '0';
 }
 
@@ -32,13 +32,13 @@ void switchDemoHandler() {
         string[i] = pushed ? '1' : '0';
     }
 
-    displayLED(string);
+    displayDigits(string);
 }
 
 static inline void refreshCounter(uint16_t counter) {
     char string[5] = "    ";
     integerToString(counter, string);
-    displayLED(string);
+    displayDigits(string);
 }
 
 static inline uint16_t addToCounter(uint16_t counter, uint16_t increment) {
@@ -54,9 +54,11 @@ void counterHandler() {
     static uint8_t last_switch = 0xFF;
     static uint16_t last_tick = 0;
     static Tick cumulative_tick = 0;
-    static uint16_t counter_accumulated_increment = 0;
+    static uint16_t increment_events = 0;
     static Tick tick_at_last_increment = 0;
+    static bool first_incremented = false;
 
+    static const Tick initial_tick_delay = 30;
     static const Tick tick_delay = 50;
 
     bool any_pushed = false;
@@ -67,8 +69,8 @@ void counterHandler() {
     static Tick tick_at_first_pushed[4] = {0};
 
     for(int sw_i = 0; sw_i < 4; sw_i++) {
-        const uint16_t tens_unit_delay = 9;
-        const uint16_t hundreds_unit_delay = 90;
+        const uint16_t tens_increments_delay = 9;
+        const uint16_t hundreds_increments_delay = 19;
 
         if(readGpioNonblocking(*SW[sw_i], &last_pushed[sw_i], &tick_at_first_pushed[sw_i])) {
             /* a button pushed in */
@@ -79,8 +81,9 @@ void counterHandler() {
                 /* reset switch hold state if new switch */
                 last_tick = now;
                 cumulative_tick = 0;
-                counter_accumulated_increment = 0;
+                increment_events = 0;
                 tick_at_last_increment = 0;
+                first_incremented = false;
             }
             last_switch = sw_i;
 
@@ -105,20 +108,24 @@ void counterHandler() {
                     continue;
                 }
 
-                if(cumulative_tick < tick_delay){
+                if(cumulative_tick < initial_tick_delay){
+                    if(!first_incremented) {
+                        counter = addToCounter(counter, increment);
+                        first_incremented = true;
+                    }
                     /* wait for short time before we start incrementing while holding */
                     continue;
                 }
 
-                if(cumulative_tick >= tick_delay) {
+                if(cumulative_tick >= tick_delay + initial_tick_delay) {
                     long_push = true;
                     /* single push wait elapsed, start incrementing by at least 1 */
                     uint16_t scaled_increment = increment;
-                    if(counter_accumulated_increment > tens_unit_delay &&
-                       counter_accumulated_increment < hundreds_unit_delay) {
+                    if(increment_events > tens_increments_delay &&
+                       increment_events <= hundreds_increments_delay) {
                         /* long press, start incrementing by 10  */
                         scaled_increment = 10 * increment;
-                    } else if (counter_accumulated_increment >= hundreds_unit_delay) {
+                    } else if (increment_events > hundreds_increments_delay) {
                         /* longer press, start incrementing by 100*/
                         scaled_increment = 100 * increment;
                     }
@@ -126,9 +133,8 @@ void counterHandler() {
                     TickDifference diff = now - tick_at_last_increment;
                     if(diff >= tick_delay) {
                         tick_at_last_increment = now;
-                        counter_accumulated_increment += scaled_increment;
+                        increment_events++;
                         counter = addToCounter(counter, scaled_increment);
-                        refreshCounter(counter);
                     }
                 }
             } while(0);
@@ -140,22 +146,31 @@ void counterHandler() {
         if ((last_switch == 2 || last_switch == 3) && long_push == false) {
             /* single push, increment */
             counter += increment;
-            refreshCounter(counter);
         }
         last_switch = 0xFF;
     }
+    refreshCounter(counter);
 }
+
 void tickHandler() {
     Tick tick = getTick();
     char string[5] = "    ";
     integerToString(tick, string);
-    displayLED(string);
+    displayDigits(string);
+}
+
+void stopwatchHandler() {
+    Tick tick = getTick();
+    char seconds[5] = "    ";
+    integerToString((((uint16_t)tick) / (uint16_t)250) % (uint16_t)60, seconds);
+    displayDigits(seconds);
 }
 
 ModeHandler Handlers[] = {
-    switchDemoHandler,
     counterHandler,
+    switchDemoHandler,
     tickHandler,
+    stopwatchHandler,
     0,
 };
 

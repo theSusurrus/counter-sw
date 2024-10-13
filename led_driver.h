@@ -18,7 +18,7 @@ extern "C" {
 
 void handleLEDInterrupt();
 void clearDisplay();
-void displayLED(char string[5]);
+void displayDigits(char string[5]);
 
 #ifdef	__cplusplus
 }

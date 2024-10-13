@@ -326,10 +326,9 @@ GPIO* CharacterCathodes[] = {
     &CCD1,
 };
 
-void displayLED(char string[5]) {
+void displayDigits(char string[5]) {
     strcpy(StringDisplayed, string);
 }
-
 
 bool interruptFired = false;
 void handleLEDInterrupt() {

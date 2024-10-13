@@ -18,7 +18,7 @@
 #define TIMER1_COMPARE_VALUE  62
 
 #define TIMER2_PRESCALER      (0 << CS22) | (1 << CS21) | (0 << CS20)
-#define TIMER2_COMPARE_VALUE  80
+#define TIMER2_COMPARE_VALUE  200
 
 #define F_CPU 1000000UL
 
