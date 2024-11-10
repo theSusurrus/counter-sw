@@ -192,7 +192,7 @@ static void handleTapperButton(TapperButton button,
     case REMOVE:
         if(*tapped > 0) {
             (*tapped)--;
-        } else if(untapped > 0) {
+        } else if(*untapped > 0) {
             (*untapped)--;
         }
         break;
@@ -308,9 +308,6 @@ void stopwatchHandler() {
 ModeHandler Handlers[] = {
     tapperHandler,
     counterHandler,
-    switchDemoHandler,
-    tickHandler,
-    stopwatchHandler,
     0,
 };
 

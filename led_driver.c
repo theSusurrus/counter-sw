@@ -251,6 +251,17 @@ Segments CharSpace = {
     .DP = 0,
 };
 
+Segments CharColon = {
+    .AL123 = 1,
+    .B = 0,
+    .C = 0,
+    .D = 0,
+    .E = 0,
+    .F = 0,
+    .G = 0,
+    .DP = 0,
+};
+
 void clearDisplay() {
     setAnodes(CharSpace);
     setGPIO(CCD1, TRISTATE);
@@ -312,7 +323,7 @@ static void setCharacter(char c) {
             setAnodes(Char9);
             break;
         case ':':
-            setAnodes(CharA);
+            setAnodes(CharColon);
             break;
         default:
             clearDisplay();
@@ -329,6 +340,12 @@ GPIO* CharacterCathodes[] = {
     &CCD1,
 };
 
+bool colonEnabled = false;
+
+void setColon(bool enabled) {
+    colonEnabled = enabled;
+}
+
 void displayDigits(char string[5]) {
     strcpy(StringDisplayed, string);
 }
@@ -340,15 +357,22 @@ void handleLEDInterrupt() {
     if(interruptFired) {
         interruptFired = false;
 
-        if(CharacterDisplayed >= 3) {
+        if(CharacterDisplayed > 4) {
             CharacterDisplayed = 0;
         } else {
             CharacterDisplayed++;
         }
 
         clearDisplay();
-        setCharacter(StringDisplayed[CharacterDisplayed]);
-        setGPIO(*CharacterCathodes[CharacterDisplayed], OUTPUT_SINK);
+        if(CharacterDisplayed < 4) {
+            setCharacter(StringDisplayed[CharacterDisplayed]);
+            setGPIO(*CharacterCathodes[CharacterDisplayed], OUTPUT_SINK);
+        } else {
+            if(colonEnabled) {
+                setCharacter(':');
+                setGPIO(CCD4, OUTPUT_SINK);
+            }
+        }
     }
 
     sei();
