@@ -311,6 +311,9 @@ static void setCharacter(char c) {
         case '9':
             setAnodes(Char9);
             break;
+        case ':':
+            setAnodes(CharA);
+            break;
         default:
             clearDisplay();
             break;

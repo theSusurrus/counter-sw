@@ -14,6 +14,5 @@ typedef int64_t TickDifference;
 typedef uint64_t Tick;
 
 Tick getTick();
-void handleTick();
 
 #endif /* _TIMEKEEPING_H_ */
