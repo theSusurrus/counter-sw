@@ -22,7 +22,6 @@ void init() {
     for(int i = 0; i < SW_NUMBER; i++) {
         setGPIO(*SW[i], TRISTATE); // enable inputs on switches
     }
-    
 
    // init Timer1 with Fast PWM and ICR for compare mode (14) to get long periods
    TIMSK  |= (1 << TICIE1);                                    // set input capture interrupt enable

@@ -159,6 +159,9 @@ void counterHandler() {
 
 static inline void refreshTapper(uint8_t tapped, uint8_t untapped) {
     char string[5] = "    ";
+    integer2DigitToString(tapped, string);
+    integer2DigitToString(untapped, string + 2);
+    displayDigits(string);
 }
 
 typedef enum TapperButton_T {
