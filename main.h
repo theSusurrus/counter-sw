@@ -15,11 +15,11 @@
 #define TIMER1_PRESCALER      (1 << CS11) | (1 << CS10)
 /* 1MHz / 64 / 62  ~= 250Hz
    4ms period */
-#define TIMER1_COMPARE_VALUE  62
+#define TIMER1_COMPARE_VALUE  248
 
 #define TIMER2_PRESCALER      (0 << CS22) | (1 << CS21) | (0 << CS20)
-#define TIMER2_COMPARE_VALUE  200
+#define TIMER2_COMPARE_VALUE  800
 
-#define F_CPU 1000000UL
+#define F_CPU 4000000UL
 
 #endif
